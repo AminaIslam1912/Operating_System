@@ -1,0 +1,187 @@
+// // /*
+// //  * Copyright (c) 2022 
+// //  * Computer Science and Engineering, University of Dhaka
+// //  * Credit: CSE Batch 25 (starter) and Prof. Mosaddek Tushar
+// //  *
+// //  * Redistribution and use in source and binary forms, with or without
+// //  * modification, are permitted provided that the following conditions
+// //  * are met:
+// //  * 1. Redistributions of source code must retain the above copyright
+// //  *    notice, this list of conditions and the following disclaimer.
+// //  * 2. Redistributions in binary form must reproduce the above copyright
+// //  *    notice, this list of conditions and the following disclaimer in the
+// //  *    documentation and/or other materials provided with the distribution.
+// //  * 3. Neither the name of the University nor the names of its contributors
+// //  *    may be used to endorse or promote products derived from this software
+// //  *    without specific prior written permission.
+// //  *
+// //  * THIS SOFTWARE IS PROVIDED BY THE UNIVERSITY AND CONTRIBUTORS ``AS IS'' AND
+// //  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// //  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// //  * ARE DISCLAIMED.  IN NO EVENT SHALL THE UNIVERSITY OR CONTRIBUTORS BE LIABLE
+// //  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// //  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+// //  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// //  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// //  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+// //  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// //  * SUCH DAMAGE.
+// // */
+
+// #include <syscall.h>
+// #include <syscall_def.h>
+// #include <errno.h>
+// #include <errmsg.h>
+// void syscall(uint16_t callno)
+// {
+// /* The SVC_Handler calls this function to evaluate and execute the actual function */
+// /* Take care of return value or code */
+// 	switch(callno)
+// 	{
+// 		/* Write your code to call actual function (kunistd.h/c or times.h/c and handle the return value(s) */
+// 		case SYS_read: 
+// 			break;
+// 		case SYS_write:
+// 			break;
+// 		case SYS_reboot:
+// 			break;	
+// 		case SYS__exit:
+// 			break;
+// 		case SYS_getpid:
+// 			break;
+// 		case SYS___time:
+// 			break;
+// 		case SYS_yield:
+// 			break;				
+// 		/* return error code see error.h and errmsg.h ENOSYS sys_errlist[ENOSYS]*/	
+// 		default: ;
+// 	}
+// /* Handle SVC return here */
+// }
+
+
+/*
+ * Copyright (c) 2022 
+ * Computer Science and Engineering, University of Dhaka
+ * Credit: CSE Batch 25 (starter) and Prof. Mosaddek Tushar
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE UNIVERSITY AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE UNIVERSITY OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+#include <syscall.h>
+#include <syscall_def.h>
+#include <errno.h>
+#include <errmsg.h>
+#include <kunistd.h>
+#include <stdint.h>
+#include <sys/types.h>
+#include<types.h>
+
+/**
+ * @brief Main syscall dispatcher
+ * @param callno: System call number (extracted from stacked r0)
+ * @param svc_args: Pointer to stacked registers
+ *        [0]=syscall#, [1]=arg0, [2]=arg1, [3]=arg2, [4]=r12, [5]=lr, [6]=pc, [7]=xpsr
+ * 
+ * This function is called from SVC_Handler_C and dispatches to appropriate
+ * kernel functions based on the syscall number. The return value should be
+ * placed in svc_args[0] (which represents the stacked r0 register).
+ */
+void syscall(uint16_t callno, uint32_t *svc_args)
+{
+    int32_t ret = 0;  // Return value (will be placed in r0)
+    
+    switch(callno)
+    {
+        case SYS_read:
+        {
+            // Extract arguments from shifted stack positions
+            int fd = (int)svc_args[1];      // arg0 is now in position [1]
+            void *buf = (void *)svc_args[2]; // arg1 is now in position [2]
+            size_t n = (size_t)svc_args[3];  // arg2 is now in position [3]
+            
+            // Call kernel function (implement in kunistd.c)
+            ret = k_read(fd, buf, n);
+            break;
+        }
+        
+        case SYS_write:
+        {
+            int fd = (int)svc_args[1];
+            const void *buf = (const void *)svc_args[2];
+            size_t n = (size_t)svc_args[3];
+            
+            // Call kernel function (implement in kunistd.c)
+            ret = k_write(fd, buf, n);
+            break;
+        }
+        
+        case SYS___time:
+        {
+            // Get current SysTick time in milliseconds
+            // No arguments needed
+            ret = (int32_t)k_getSysTickTime();
+            break;
+        }
+        
+        case SYS_getpid:
+        {
+            // Get process ID
+            ret = k_getpid();
+            break;
+        }
+        
+        case SYS_yield:
+        {
+            // Yield CPU
+            k_yield();
+            ret = 0;
+            break;
+        }
+        
+        case SYS__exit:
+        {
+            // Exit process
+            k_exit();
+            ret = 0;  // Never actually returns
+            break;
+        }
+        
+        case SYS_reboot:
+        {
+            // Reboot system
+            ret = k_reboot();
+            break;
+        }
+        
+        default:
+            // Unknown system call - return error
+            ret = -ENOSYS;  // Function not implemented
+            break;
+    }
+    
+    // Store return value in stacked r0 so it returns to user space
+    svc_args[0] = (uint32_t)ret;
+}
