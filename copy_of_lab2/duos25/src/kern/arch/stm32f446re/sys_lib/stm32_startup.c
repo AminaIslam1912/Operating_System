@@ -194,11 +194,14 @@ void SVC_Handler_C(uint32_t *svc_args);
 void __attribute__((naked)) SVCall_Handler(void)
 {
     __asm volatile(
-        "tst lr, #4\n"              // Test bit 2 of EXC_RETURN (which stack?)
-        "ite eq\n"                  // If-Then-Else block
-        "mrseq r0, msp\n"           // If bit 2 is 0, use Main Stack Pointer
-        "mrsne r0, psp\n"           // If bit 2 is 1, use Process Stack Pointer
-        "b SVC_Handler_C\n"         // Branch to C handler with stack pointer in r0
+        "tst lr, #4\n"              /* Which stack? */
+        "ite eq\n"
+        "mrseq r0, msp\n"           /* r0 = MSP */
+        "mrsne r0, psp\n"           /* r0 = PSP */
+        "push {lr}\n"               /* save EXC_RETURN */
+        "bl SVC_Handler_C\n"        /* call C handler */
+        "pop {lr}\n"                /* restore EXC_RETURN */
+        "bx lr\n"                   /* exception return */
     );
 }
 #include <syscall.h>
@@ -229,4 +232,3 @@ void SVC_Handler_C(uint32_t *svc_args)
     // When we return from this function, the hardware will restore
     // the stacked registers, and r0 will contain the return value
 }
-

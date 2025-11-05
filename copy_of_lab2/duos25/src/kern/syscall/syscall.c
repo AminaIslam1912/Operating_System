@@ -57,11 +57,19 @@ void syscall(uint16_t callno, uint32_t *svc_args)
     {
         case SYS_read:
         {
-            // Extract arguments from shifted stack positions
-            int fd = (int)svc_args[1];      // arg0 is now in position [1]
-            void *buf = (void *)svc_args[2]; // arg1 is now in position [2]
-            size_t n = (size_t)svc_args[3];  // arg2 is now in position [3]
+            // // Extract arguments from shifted stack positions
+            // int fd = (int)svc_args[1];      // arg0 is now in position [1]
+            // void *buf = (void *)svc_args[2]; // arg1 is now in position [2]
+            // size_t n = (size_t)svc_args[3];  // arg2 is now in position [3]
             
+            // ret = k_read(fd, buf, n);
+            // break;
+            // Extract arguments from stack
+            int fd = (int)svc_args[1];
+            void *buf = (void *)svc_args[2];
+            size_t n = (size_t)svc_args[3];
+            
+            // Call kernel function
             ret = k_read(fd, buf, n);
             break;
         }

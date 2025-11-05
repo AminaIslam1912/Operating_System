@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include <syscall_def.h>
 #include <stddef.h>
+#include<kstdio.h>
 
 /**
  * APPROACH: Pass syscall number in r0 (first argument position)
@@ -48,19 +49,18 @@
 static inline __attribute__((always_inline))
 int32_t svc_call(uint16_t svc_id, uint32_t a0, uint32_t a1, uint32_t a2)
 {
-    register uint32_t r0 __asm__("r0") = svc_id;
-    register uint32_t r1 __asm__("r1") = a0;
-    register uint32_t r2 __asm__("r2") = a1;
-    register uint32_t r3 __asm__("r3") = a2;
-
+    uint32_t ret;
     __asm volatile (
-        "svc #0"
-        : "+r"(r0)                           // r0 is both input (syscall#) and output (return)
-        : "r"(r1), "r"(r2), "r"(r3)         // r1-r3 are inputs (arguments)
-        : "r12", "lr", "memory", "cc"
-    );
-
-    return (int32_t)r0;
+        "mov r0, %1\n"
+        "mov r1, %2\n"
+        "mov r2, %3\n"
+        "mov r3, %4\n"
+        "svc #0\n"
+        "mov %0, r0\n"
+        : "=r" (ret)
+        : "r" ((uint32_t)svc_id), "r" (a0), "r" (a1), "r" (a2)
+        : "r0", "r1", "r2", "r3", "r12", "lr", "memory", "cc");
+    return (int32_t)ret;
 }
 
 /**
@@ -90,6 +90,7 @@ ssize_t write(int fd, const void *buf, size_t n)
  */
 ssize_t read(int fd, void *buf, size_t n)
 {
+    // kprintf("in read in unistd.c\n");
     return (ssize_t)svc_call(SYS_read, (uint32_t)fd, (uint32_t)buf, (uint32_t)n);
 }
 
@@ -125,4 +126,3 @@ int reboot(void)
 {
     return (int)svc_call(SYS_reboot, 0u, 0u, 0u);
 }
-

@@ -64,6 +64,9 @@ void __sys_init(void)
 	__enable_fpu(); //enable FPU single precision floating point unit
 	__ISB();
 	NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+	/* Ensure SVCall (SVC) has lower priority than USART IRQs so
+	   blocking syscalls can be preempted by UART RX interrupts. */
+	NVIC_SetPriority(SVCall_IRQn, 15);
 	__SysTick_init(180000);	//enable systick for 1ms
 	//SYS_RTC_init();
 	SerialLin2_init(__CONSOLE,0);
@@ -73,15 +76,15 @@ void __sys_init(void)
 	ConfigTimer2ForSystem();
 	__ISB();
 	#ifdef DEBUG
-	kprintf("\n************************************\r\n");
-	kprintf("Booting Machine Intelligence System 1.0 .....\r\n");
-	kprintf("Copyright (c) 2024, Prof. Mosaddek Tushar, CSE, DU\r\n");
-	kprintf("CPUID %x\n", SCB->CPUID);
-	kprintf("OS Version: 2024.1.0.0\n");
-	kprintf("Time Elapse %d ms\n",__getTime());
-	kprintf("*************************************\r\n");
-	kprintf("# ");
-	show_system_info();
+	// kprintf("\n************************************\r\n");
+	// kprintf("Booting Machine Intelligence System 1.0 .....\r\n");
+	// kprintf("Copyright (c) 2024, Prof. Mosaddek Tushar, CSE, DU\r\n");
+	// kprintf("CPUID %x\n", SCB->CPUID);
+	// kprintf("OS Version: 2024.1.0.0\n");
+	// kprintf("Time Elapse %d ms\n",__getTime());
+	// kprintf("*************************************\r\n");
+	// kprintf("# ");
+	// show_system_info();
 	// display_group_info();
 	#endif
 }

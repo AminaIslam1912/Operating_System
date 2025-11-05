@@ -36,5 +36,6 @@
 void kprintf(char*,...); 
 void kscanf(char*,...);
 void putstr(const uint8_t*,size_t);
+int kputchar(int);
 #endif /* KSTDIO */
 

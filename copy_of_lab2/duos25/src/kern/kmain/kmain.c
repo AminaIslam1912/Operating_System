@@ -90,6 +90,48 @@
 
 
 
+// #include <stdint.h>
+// #include <syscall_def.h>
+// #include "kunistd.h"
+// #include <sys_init.h>
+// #include <sys/types.h>
+// #include <cm4.h>
+// #include <kmain.h>
+// #include <stdint.h>
+// #include <sys_usart.h>
+// #include <kstdio.h>
+// #include <sys_rtc.h>
+// #include <kstring.h>
+
+// extern void main(void);
+
+// void kmain(void)
+// {
+//     // Initialize system (clocks, USART, SysTick, etc.)
+//     __sys_init();
+    
+//     kprintf("\n");
+//     kprintf("======================================\n");
+//     kprintf("  Kernel Initialized Successfully\n");
+//     kprintf("  SVC-based Syscall System Active\n");
+//     kprintf("======================================\n");
+//     kprintf("\n");
+    
+//     // Get initial time from kernel space
+//     uint32_t init_time = __get__Second();
+//     kprintf("Kernel: Initial time = %d seconds\n\n", init_time);
+    
+//     // Call user application (which will run in unprivileged mode if configured)
+//     kprintf("Kernel: Starting user application...\n\n");
+//     main();
+    
+//     // If main returns (it shouldn't in this case), just loop
+//     kprintf("Kernel: User application returned (unexpected)\n");
+//     while (1) {
+//         ms_delay(1000);
+//     }
+// }
+
 #include <stdint.h>
 #include <syscall_def.h>
 #include "kunistd.h"
@@ -109,26 +151,31 @@ void kmain(void)
 {
     // Initialize system (clocks, USART, SysTick, etc.)
     __sys_init();
+    // ms_delay(5000);
     
-    kprintf("\n");
-    kprintf("======================================\n");
-    kprintf("  Kernel Initialized Successfully\n");
-    kprintf("  SVC-based Syscall System Active\n");
-    kprintf("======================================\n");
-    kprintf("\n");
+    // kprintf("\n");
+    // kprintf("======================================\n");
+    // kprintf("  Kernel Initialized Successfully\n");
+    // kprintf("  SVC-based Syscall System Active\n");
+    // kprintf("  SYS_read and SYS_write enabled\n");
+    // kprintf("======================================\n");
+    // kprintf("\n");
     
     // Get initial time from kernel space
-    uint32_t init_time = __get__Second();
-    kprintf("Kernel: Initial time = %d seconds\n\n", init_time);
+
+    // uint32_t init_time = __get__Second();
+    // kprintf("Kernel: Initial time = %u seconds\n\n", init_time);
     
-    // Call user application (which will run in unprivileged mode if configured)
-    kprintf("Kernel: Starting user application...\n\n");
+    // // Call user application
+    // kprintf("Kernel: Starting user application...\n\n");
+
     main();
     
     // If main returns (it shouldn't in this case), just loop
-    kprintf("Kernel: User application returned (unexpected)\n");
-    while (1) {
-        ms_delay(1000);
-    }
+    // kprintf("Kernel: User application returned (unexpected)\n");
+    // while (1) {
+    //     uint32_t seconds = __get__Second();
+    //     kprintf("Time passed total: %u seconds\n", seconds);
+    //     ms_delay(1000);
+    // }
 }
-
