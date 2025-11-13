@@ -31,7 +31,8 @@
 #include <syscall_def.h>
 #include <stddef.h>
 #include<kstdio.h>
-
+#include<sys_init.h>
+#include <cm4.h> 
 /**
  * APPROACH: Pass syscall number in r0 (first argument position)
  * and shift other arguments. The handler will extract the syscall
@@ -116,13 +117,15 @@ void yield(void)
 void exitt(void)
 {
     (void)svc_call(SYS__exit, 0u, 0u, 0u);
-    for(;;){} // Never returns
+    // for(;;){} // Never returns
 }
 
 /**
  * @brief Reboot system
  */
-int reboot(void)
+void reboot(void)
 {
-    return (int)svc_call(SYS_reboot, 0u, 0u, 0u);
+    // kprintf("Reboot syscall invoked from userland\n");
+    // ms_delay(1000);
+    (void)svc_call(SYS_reboot, 0u, 0u, 0u);
 }

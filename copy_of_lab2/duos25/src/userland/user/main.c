@@ -322,11 +322,11 @@ int main(void)
 
     uint32_t t = getSysTickTime();
 
-    kprintf("Time: %u ms ✓\n", t);
+    kprintf("Time: %u ms \n", t);
     ms_delay(2000);
 
     int pid = getpid();
-    kprintf("PID: %d ✓\n\n", pid);
+    kprintf("PID: %d \n\n", pid);
     ms_delay(2000);
 
     // Now test read
@@ -348,8 +348,8 @@ int main(void)
     if (n > 0)
     {
         buffer[n] = '\0';
-        kprintf("  Data: '%s'\n", buffer);
-        kprintf("  ✓ SUCCESS!\n");
+        kprintf("  String : %s\n", buffer);
+        // kprintf("  ✓ SUCCESS!\n");
     }
     else if (n == 0)
     {
@@ -360,14 +360,26 @@ int main(void)
         kprintf("  Error code: %d\n", n);
     }
 
-    write(1, "mainf", 5);
+    write(1, "helloFromWrite", 14);
 
     kprintf("\n=== Test complete ===\n");
+    ms_delay(2000);
 
-    while (1)
-    {
-        ms_delay(1000);
-    }
+    // while (1)
+    // {
+    //     ms_delay(1000);
+    // }
+
+    kprintf("Initiating system reboot...\n");
+    ms_delay(100); 
+
+    yield();
+    ms_delay(1000); 
+    
+
+    reboot();   
+    
+    
 
     return 0;
 }

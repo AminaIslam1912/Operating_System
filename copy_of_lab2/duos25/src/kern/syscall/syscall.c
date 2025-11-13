@@ -38,6 +38,9 @@
 #include <kunistd.h>
 #include <stdint.h>
 #include <sys/types.h>
+#include <kstdio.h>
+#include <sys_init.h>
+#include <cm4.h>
 
 /**
  * @brief Main syscall dispatcher
@@ -118,6 +121,8 @@ void syscall(uint16_t callno, uint32_t *svc_args)
         case SYS_reboot:
         {
             // Reboot system
+            // kprintf("syscall: SYS_reboot received\n");
+            // ms_delay(1000);  // Allow time for message to be printed
             ret = k_reboot();
             break;
         }

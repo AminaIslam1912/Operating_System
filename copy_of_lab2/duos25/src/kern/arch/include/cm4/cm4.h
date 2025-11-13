@@ -696,6 +696,10 @@ void SYS_SLEEP_WFI(void);
 * Functions on FPU
 **/
 void __enable_fpu(void);
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

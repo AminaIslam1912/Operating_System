@@ -287,4 +287,4 @@ clean:
 
 
 load:
-	openocd -f D:\openocd\openocd-20250710\OpenOCD-20250710-0.12.0\share\openocd\scripts\interface\stlink.cfg -f D:\openocd\openocd-20250710\OpenOCD-20250710-0.12.0\share\openocd\scripts\target\stm32f4x.cfg -c "program target/duos verify"
+	openocd -f D:\openocd\openocd-20250710\OpenOCD-20250710-0.12.0\share\openocd\scripts\interface\stlink.cfg -f D:\openocd\openocd-20250710\OpenOCD-20250710-0.12.0\share\openocd\scripts\target\stm32f4x.cfg -c "program target/duos verify reset"

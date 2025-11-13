@@ -19,7 +19,7 @@ ssize_t read(int fd, void *buf, size_t n);
 int getpid(void);
 void yield(void);
 void exitt(void);
-int reboot(void);
+void reboot(void);
 uint32_t getSysTickTime(void);
 
 #endif /* __UNISTD_H */

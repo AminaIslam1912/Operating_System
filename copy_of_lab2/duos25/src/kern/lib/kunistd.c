@@ -9,6 +9,7 @@
 #include <UsartRingBuffer.h>
 #include<unistd.h>
 #include <kstdio.h>
+#include <sys_init.h>
 
 
 // UART register definitions (same as your working code)
@@ -54,7 +55,8 @@ ssize_t k_write(int fd, const void *buf, size_t n)
     }
     
     // For STDOUT (fd=1) and STDERR (fd=2), write to debug console
-    if (fd == 1 || fd == 2) {
+    // if (fd == 1 || fd == 2) {
+    if (fd == STDOUT_FILENO ) {
         const uint8_t *str = (const uint8_t *)buf;
         putstr(str, n);
         return (ssize_t)n;
@@ -185,7 +187,7 @@ ssize_t k_read(int fd, void *buf, size_t n)
     }
     
     // Only handle STDIN (fd=0)
-    if (fd != STDIN_FILENO && fd != 0) {
+    if (fd != STDIN_FILENO ) {
         return -ENOSYS;  // Not implemented for other file descriptors
     }
     
@@ -232,6 +234,7 @@ int k_getpid(void)
 {
     // TODO: Implement actual process management
     // For now, return a dummy PID
+    kprintf("Process getpid called\n");
     return 1;
 }
 
@@ -243,6 +246,7 @@ void k_yield(void)
 {
     // TODO: Implement actual process scheduler
     // For now, this is a no-op
+    kprintf("Process yield called\n");
 }
 
 /**
@@ -254,29 +258,64 @@ void k_exit(void)
     // TODO: Implement actual process termination
     // For now, just halt
     kprintf("Process exit called\n");
-    while(1) {
-        __WFI();  // Wait for interrupt (low power mode)
-    }
+    // while(1) {
+    //     __WFI();  // Wait for interrupt (low power mode)
+    // }
 }
 
 /**
  * @brief Kernel implementation of reboot
  * @return 0 on success, negative error code on failure
  */
+// int k_reboot(void)
+// {
+//     // Print message to inform user
+//     kprintf("System rebooting...\n");
+
+//     while(!(USART2->SR & USART_SR_TC));
+    
+//     // Give time for UART to transmit the message
+//     ms_delay(1000);
+    
+//     // Perform software reset using ARM Cortex-M AIRCR register
+//     // AIRCR = Application Interrupt and Reset Control Register
+//     SCB->AIRCR = (0x5FA << 16) |      // VECTKEY: Write key (required)
+//                  (SCB->AIRCR & 0x700) | // Keep priority group unchanged
+//                  (1 << 2);             // SYSRESETREQ: Request system reset
+    
+//     // Should never reach here - system will reset
+//     while(1);
+    
+//     return 0;
+// }
+
+
 int k_reboot(void)
 {
-    // Perform software reset using ARM Cortex-M AIRCR register
-    kprintf("System rebooting...\n");
-    ms_delay(100);  // Give time for message to transmit
+    // Print message and flush UART
+//     kprintf("System rebooting...\n");
     
-    // Request system reset
-    SCB->AIRCR = (0x5FA << 16) |      // VECTKEY
-                 (SCB->AIRCR & 0x700) | // Keep priority group
-                 (1 << 2);             // SYSRESETREQ
+//    while ((UART_SR & UART_TX_READY) == 0) {
+//     /* wait for the last byte to leave USART2 */
+// }
+
+
+   
     
-    // Should never reach here
+    // Give more time for UART transmission
+    // ms_delay(1000);
+    
+    // Disable all interrupts
+    //  __disable_irq();
+    
+    // Perform system reset
+    SCB->AIRCR = ((0x5FA << SCB_AIRCR_VECTKEY_Pos) | 
+                  (SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) |
+                  SCB_AIRCR_SYSRESETREQ_Msk);
+    
+    // Wait for reset
     while(1);
     
-    return 0;
+    return 0; // Never reached
 }
 
