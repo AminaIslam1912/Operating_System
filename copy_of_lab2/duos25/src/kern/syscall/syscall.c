@@ -60,14 +60,7 @@ void syscall(uint16_t callno, uint32_t *svc_args)
     {
         case SYS_read:
         {
-            // // Extract arguments from shifted stack positions
-            // int fd = (int)svc_args[1];      // arg0 is now in position [1]
-            // void *buf = (void *)svc_args[2]; // arg1 is now in position [2]
-            // size_t n = (size_t)svc_args[3];  // arg2 is now in position [3]
-            
-            // ret = k_read(fd, buf, n);
-            // break;
-            // Extract arguments from stack
+           
             int fd = (int)svc_args[1];
             void *buf = (void *)svc_args[2];
             size_t n = (size_t)svc_args[3];
@@ -89,8 +82,7 @@ void syscall(uint16_t callno, uint32_t *svc_args)
         
         case SYS___time:
         {
-            // Get current SysTick time in milliseconds
-            // No arguments needed - just call the kernel function
+            
             ret = (int32_t)k_getSysTickTime();
             break;
         }
@@ -120,16 +112,14 @@ void syscall(uint16_t callno, uint32_t *svc_args)
         
         case SYS_reboot:
         {
-            // Reboot system
-            // kprintf("syscall: SYS_reboot received\n");
-            // ms_delay(1000);  // Allow time for message to be printed
+            
             ret = k_reboot();
             break;
         }
         
         default:
             // Unknown system call - return error
-            ret = -ENOSYS;  // Function not implemented
+            ret = -ENOSYS;  
             break;
     }
     

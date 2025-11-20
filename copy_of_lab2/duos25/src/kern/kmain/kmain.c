@@ -153,29 +153,42 @@ void kmain(void)
     __sys_init();
     // ms_delay(5000);
     
-    // kprintf("\n");
-    // kprintf("======================================\n");
-    // kprintf("  Kernel Initialized Successfully\n");
-    // kprintf("  SVC-based Syscall System Active\n");
-    // kprintf("  SYS_read and SYS_write enabled\n");
-    // kprintf("======================================\n");
-    // kprintf("\n");
     
-    // Get initial time from kernel space
 
-    // uint32_t init_time = __get__Second();
-    // kprintf("Kernel: Initial time = %u seconds\n\n", init_time);
-    
-    // // Call user application
-    // kprintf("Kernel: Starting user application...\n\n");
+    // kprintf_mod("%d, ms\n", __getTime());
 
-    main();
+    kprintf("  Kernel Initialized Successfully\n");
+    kprintf("  SVC-based Syscall System\n");
+ 
+    // Check processor mode (privileged or unprivileged)
+    uint32_t control_reg;
+    __asm volatile ("MRS %0, CONTROL" : "=r" (control_reg));
+ 
+    if (control_reg & 0x01) {
+         kprintf("Mode: Unprivileged\n");
+    } else {
+        // kprintf("Mode: Privileged\n");
+ 
+        // Switch to unprivileged mode
+         kprintf("Switching to Unprivileged mode...\n");
+        control_reg |= 0x01;  
+        __asm volatile ("MSR CONTROL, %0" : : "r" (control_reg));
+        __asm volatile ("ISB");  // Instruction Synchronization Barrier
+ 
+        // Verify the mode change
+        __asm volatile ("MRS %0, CONTROL" : "=r" (control_reg));
+        if (control_reg & 0x01) {
+             kprintf("Mode changed to: Unprivileged\n");
+        } else {
+             kprintf("Mode is still: Privileged\n");
+        }
+
+    }
+ 
+        
+     kprintf("Kernel: Starting user application...\n\n");
+
+     main();
     
-    // If main returns (it shouldn't in this case), just loop
-    // kprintf("Kernel: User application returned (unexpected)\n");
-    // while (1) {
-    //     uint32_t seconds = __get__Second();
-    //     kprintf("Time passed total: %u seconds\n", seconds);
-    //     ms_delay(1000);
-    // }
+    
 }

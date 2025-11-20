@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-#define MAX_TASKS   5
+// #define MAX_TASKS   5
 
 /* some stack memory calculations */
 #define SIZE_TASK_STACK          1024U

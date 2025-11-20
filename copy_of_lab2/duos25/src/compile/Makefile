@@ -109,11 +109,15 @@ kstdio.o: $(OS_PATH)/lib/kstdio.c
 kstring.o: $(OS_PATH)/lib/kstring.c
 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $(OBJECT)/$@
 
+# process.o: $(OS_PATH)/lib/process.c
+# 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $(OBJECT)/$@
+
 kmain.o: $(OS_PATH)/kmain/kmain.c
 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $(OBJECT)/$@
 	
 sys_init.o: $(OS_PATH)/lib/kern/sys_init.c
 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $(OBJECT)/$@
+
 
 sys_clock.o: $(OS_SYS_LIB)/sys_clock.c
 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $(OBJECT)/$@
@@ -181,6 +185,9 @@ sys_rtc.o: $(OS_SYS_LIB)/sys_rtc.c
 test_can.o: $(USERLAND)/utils/test_can.c
 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $(OBJECT)/$@
 
+
+
+
 # syscall.o: $(OS_PATH)/syscall/syscall.c
 # 	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $(OBJECT)/$@
 # Build the user app (main.c)
@@ -217,6 +224,7 @@ duos: $(OBJECT)/kmath.o \
 	$(OBJECT)/sys_rtc.o \
 	$(OBJECT)/user_main.o \
 	$(OBJECT)/syscall.o 
+
 # 	$(OBJECT)/unistd.o 
 # 	$(OBJECT)/ktimes.o
 	$(CC) $(LDFLAGS) $^ -o $(TARGET)/$@
@@ -250,7 +258,8 @@ final.elf: $(OBJECT)/kmath.o \
 	$(OBJECT)/sys_err.o \
 	$(OBJECT)/sys_rtc.o \
 	$(OBJECT)/syscall.o \
-	$(OBJECT)/user_main.o # <-- add this line
+	$(OBJECT)/user_main.o 
+	
 	
 # 	$(OBJECT)/kunistd.o 
 # 	$(OBJECT)/ktimes.o 

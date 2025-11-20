@@ -12,7 +12,7 @@
 #include <sys_init.h>
 
 
-// UART register definitions (same as your working code)
+// UART register definitions 
 #define UART_BASE     0x40004400U   // USART2 base address
 #define UART_SR       (*(volatile uint32_t*)(UART_BASE + 0x00))
 #define UART_DR       (*(volatile uint32_t*)(UART_BASE + 0x04))
@@ -73,93 +73,7 @@ ssize_t k_write(int fd, const void *buf, size_t n)
  * @param n: Number of bytes to read
  * @return Number of bytes read, or negative error code
  */
-// ssize_t k_read(int fd, void *buf, size_t n)
-// {
-//     if (buf == NULL) {
-//         return -EINVAL;
-//     }
-//     if (n == 0) {
-//         return 0;
-//     }
 
-//     if (fd == 0) {
-//         uint8_t *dst = (uint8_t *)buf;
-//         /* Cap input length at 256 bytes as per spec */
-//         size_t max = (n > 256u) ? 256u : n;
-//         size_t i = 0;
-//         while (i < max) {
-//             /* Wait for data; SVC has lower prio than USART, so RX IRQ
-//                can preempt and fill the ring buffer. */
-//             while (IsDataAvailable(__CONSOLE) <= 0) {
-//                 /* spin until a byte arrives */
-//             }
-//             int c = Uart_read(__CONSOLE);
-//             if (c < 0) {
-//                 continue;
-//             }
-//             dst[i++] = (uint8_t)c;
-//             if (c == '\n' || c == '\r') {
-//                 break;
-//             }
-//         }
-//         /* If caller requested more than 256, ignore the extra input per spec.
-//            We do not flush here to avoid blocking indefinitely; extras remain
-//            in the ring buffer. */
-//         return (ssize_t)i;
-//     }
-
-//     return -ENOSYS;
-// }
-
-// ssize_t k_read(int fd, void *buf, size_t n)
-// {
-//     kprintf("in k_read \n");
-//     if (buf == NULL) {
-//         return -EINVAL;
-//     }
-//     if (n == 0) {
-//         return 0;
-//     }
-
-//     // Cap input length at 256 bytes as per spec
-//     if (n > 256u) {
-//         n = 256u;
-//     }
-
-//     // Only support STDIN for now
-//     if (fd != 0 && fd != STDIN_FILENO) {
-//         return -ENOSYS;
-//     }
-
-//     uint8_t *dst = (uint8_t *)buf;
-//     size_t i = 0;
-
-//     while (i < n) {
-//         // Wait for a byte to be available in the RX ring buffer
-//         while (IsDataAvailable(__CONSOLE) <= 0) {
-//             // busy wait; USART IRQ fills the buffer
-//         }
-
-//         int c = Uart_read(__CONSOLE);
-//         if (c < 0) {
-//             // On transient error, continue; if nothing read yet, report EIO
-//             if (i == 0) return -EIO;
-//             break;
-//         }
-
-//         dst[i++] = (uint8_t)c;
-
-//         // Echo back the character for user feedback
-//         Uart_write((int)(uint8_t)c, __CONSOLE);
-
-//         // Stop on newline or carriage return
-//         if (c == '\n' || c == '\r') {
-//             break;
-//         }
-//     }
-
-//     return (ssize_t)i;
-// }
 
 
 static int uart_recv_char(void) 
@@ -234,7 +148,7 @@ int k_getpid(void)
 {
     // TODO: Implement actual process management
     // For now, return a dummy PID
-    kprintf("Process getpid called\n");
+    kprintf("\nProcess getpid called\n");
     return 1;
 }
 
@@ -246,7 +160,7 @@ void k_yield(void)
 {
     // TODO: Implement actual process scheduler
     // For now, this is a no-op
-    kprintf("Process yield called\n");
+    kprintf("\n\nProcess yield called\n");
 }
 
 /**
@@ -267,47 +181,11 @@ void k_exit(void)
  * @brief Kernel implementation of reboot
  * @return 0 on success, negative error code on failure
  */
-// int k_reboot(void)
-// {
-//     // Print message to inform user
-//     kprintf("System rebooting...\n");
-
-//     while(!(USART2->SR & USART_SR_TC));
-    
-//     // Give time for UART to transmit the message
-//     ms_delay(1000);
-    
-//     // Perform software reset using ARM Cortex-M AIRCR register
-//     // AIRCR = Application Interrupt and Reset Control Register
-//     SCB->AIRCR = (0x5FA << 16) |      // VECTKEY: Write key (required)
-//                  (SCB->AIRCR & 0x700) | // Keep priority group unchanged
-//                  (1 << 2);             // SYSRESETREQ: Request system reset
-    
-//     // Should never reach here - system will reset
-//     while(1);
-    
-//     return 0;
-// }
 
 
 int k_reboot(void)
 {
-    // Print message and flush UART
-//     kprintf("System rebooting...\n");
-    
-//    while ((UART_SR & UART_TX_READY) == 0) {
-//     /* wait for the last byte to leave USART2 */
-// }
-
-
    
-    
-    // Give more time for UART transmission
-    // ms_delay(1000);
-    
-    // Disable all interrupts
-    //  __disable_irq();
-    
     // Perform system reset
     SCB->AIRCR = ((0x5FA << SCB_AIRCR_VECTKEY_Pos) | 
                   (SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) |
@@ -318,4 +196,3 @@ int k_reboot(void)
     
     return 0; // Never reached
 }
-

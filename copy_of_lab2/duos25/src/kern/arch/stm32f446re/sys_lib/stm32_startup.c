@@ -29,6 +29,8 @@
  */
  
 #include <stm32_startup.h>
+#include <stddef.h>
+extern void main(void);
 const uint32_t STACK_START = (uint32_t)SRAM_END;
 uint32_t NVIC_VECTOR[] __attribute__((section (".isr_vector")))={
 	STACK_START,
@@ -161,7 +163,8 @@ void Reset_Handler(void){
 	_text_size = (uint32_t)&_etext - (uint32_t)&_stext;
 	_data_size = (uint32_t)&_edata - (uint32_t)&_sdata;
 	_bss_size = (uint32_t)&_ebss - (uint32_t)&_sbss;
-	kmain();
+	 kmain();
+	//main();
 }
 void Default_Handler(void){
 	while(1);
@@ -205,9 +208,7 @@ void __attribute__((naked)) SVCall_Handler(void)
     );
 }
 #include <syscall.h>
-/* svc_args layout on exception entry:
-   svc_args[0] = r0, [1] = r1, [2] = r2, [3] = r3,
-   [4] = r12, [5] = lr, [6] = pc, [7] = xpsr */
+
 void SVC_Handler_C(uint32_t *svc_args)
 {
     // Stack layout after exception entry:
@@ -226,7 +227,7 @@ void SVC_Handler_C(uint32_t *svc_args)
     extern void syscall(uint16_t callno, uint32_t *svc_args);
     
     // Call the syscall dispatcher
-    // The syscall function will modify svc_args[0] to set the return value
+   
     syscall(svc_number, svc_args);
     
     // When we return from this function, the hardware will restore
@@ -234,3 +235,33 @@ void SVC_Handler_C(uint32_t *svc_args)
 }
 
 
+
+// void __attribute__((naked)) PendSV_Handler(void)
+// {
+//     __asm volatile(
+//         "mrs r0, psp\n"
+//         "cbz r0, pend_prepare\n"
+//         "ldr r3, =g_prev_tcb\n"
+//         "ldr r2, [r3]\n"
+//         "cbz r2, pend_prepare\n"
+//         "stmdb r0!, {r4-r11}\n"
+//         "str r0, [r2, %[psp_off]]\n"
+//         "pend_prepare:\n"
+//         "ldr r3, =g_next_tcb\n"
+//         "ldr r2, [r3]\n"
+//         "cbz r2, pend_cleanup\n"
+//         "ldr r0, [r2, %[psp_off]]\n"
+//         "cbz r0, pend_cleanup\n"
+//         "ldmia r0!, {r4-r11}\n"
+//         "msr psp, r0\n"
+//         "pend_cleanup:\n"
+//         "mov r1, #0\n"
+//         "str r1, [r3]\n"
+//         "ldr r3, =g_prev_tcb\n"
+//         "str r1, [r3]\n"
+//         "pend_end:\n"
+//         "bx lr\n"
+//         :
+//         : [psp_off] "I"(TCB_PSP_OFFSET)
+//         : "r0", "r1", "r2", "r3", "memory");
+// }
